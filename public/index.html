@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Transfer | Share Large Files</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: linear-gradient(-45deg, #0f172a, #1e293b, #0f2027, #203a43); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; padding-bottom: 80px; overflow-x: hidden; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        
+        nav { width: 100%; padding: 20px 50px; display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255, 255, 255, 0.1); z-index: 10; }
+        nav .logo { font-size: 24px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        nav .logo i { color: #facc15; }
+        
+        .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 40px; width: 90%; max-width: 800px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.3); margin: 40px 0; min-height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+        
+        .action-circle { width: 220px; height: 220px; margin: 0 auto; border-radius: 50%; background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01)); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s ease; box-shadow: 0 0 20px rgba(0,0,0,0.1); position: relative; }
+        .action-circle::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; border: 2px dashed rgba(250, 204, 21, 0.5); animation: spin 15s linear infinite; }
+        .action-circle.receive-mode::before { border-color: rgba(34, 197, 94, 0.5); }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .action-circle:hover, .action-circle.hover { background: rgba(250, 204, 21, 0.1); transform: scale(1.05); }
+        .action-circle:hover::before { border: 2px solid rgba(250, 204, 21, 0.8); animation: spin 5s linear infinite; }
+        .action-circle i { font-size: 50px; color: #facc15; margin-bottom: 15px; animation: float 3s ease-in-out infinite; }
+        .action-circle.receive-mode i { color: #22c55e; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        .action-circle span { font-size: 20px; font-weight: 600; color: #ffffff; z-index: 2; }
+        .small-text { font-size: 12px; color: #94a3b8; margin-top: 5px; z-index: 2; }
+        
+        #receive-input-box { display: none; flex-direction: column; align-items: center; width: 100%; margin-top: 20px; }
+        #receive-input-box input { width: 80%; max-width: 400px; padding: 15px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; text-align: center; font-size: 16px; outline: none; margin-bottom: 15px; transition: 0.3s; }
+        #receive-input-box input:focus { border-color: #facc15; box-shadow: 0 0 15px rgba(250, 204, 21, 0.2); }
+
+        .mode-toggle-container { position: fixed; bottom: 30px; right: 50px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 30px; padding: 5px; display: flex; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); z-index: 100; }
+        .toggle-btn { padding: 10px 25px; border: none; background: transparent; color: white; font-size: 16px; font-weight: 600; border-radius: 25px; cursor: pointer; transition: 0.3s; }
+        .toggle-btn.active { background: #facc15; color: #000; box-shadow: 0 5px 15px rgba(250, 204, 21, 0.4); }
+
+        .link-box { margin-top: 25px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 12px; display: none; width: 100%; max-width: 500px; }
+        .link-box input { width: 100%; padding: 10px; border-radius: 5px; border: none; outline: none; background: #fff; color: #333; margin-bottom: 15px; text-align: center; font-weight: bold; }
+        .social-share { display: flex; gap: 15px; justify-content: center; }
+        .icon-btn { width: 45px; height: 45px; border-radius: 50%; border: none; font-size: 20px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; color: white; background: rgba(255,255,255,0.1); }
+        .icon-btn.wa:hover { background: #25D366; transform: scale(1.1); } .icon-btn.fb:hover { background: #1877F2; transform: scale(1.1); } .icon-btn.copy:hover { background: #facc15; color: #000; transform: scale(1.1); }
+
+        #file-info { margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 12px; display: none; width: 100%; max-width: 400px; justify-content: space-between; align-items: center; }
+        .btn { padding: 12px 30px; border: none; border-radius: 30px; cursor: pointer; font-weight: 600; margin-top: 20px; font-size: 16px; transition: 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .btn-primary { background: #facc15; color: #000; display: none; }
+        .btn-primary:hover { background: #eab308; transform: translateY(-2px); }
+        .btn-success { background: #22c55e; color: #fff; display: none; }
+        .btn-success:hover { background: #16a34a; transform: translateY(-2px); }
+        
+        .history-box { margin-top: 30px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; width: 100%; text-align: left; display: none; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo"><i class="fa-solid fa-bolt"></i>ProTransfer</div>
+    </nav>
+    
+    <div class="glass-card">
+        <h1 id="status-title">Send Professional Files</h1>
+        <p id="status-desc" style="color: #94a3b8; margin-bottom: 30px;">No size limits. Direct device-to-device transfer.</p>
+        
+        <input type="file" id="file-input" multiple style="display: none;">
+        <input type="file" id="folder-input" webkitdirectory directory multiple style="display: none;">
+
+        <div id="drop-zone" class="action-circle">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+            <span>Select File</span>
+            <div class="small-text">Click or Drag & Drop</div>
+        </div>
+
+        <div id="selection-buttons" style="display: flex; gap: 10px; margin-top: 20px; margin-bottom: 10px; justify-content: center; z-index: 5;">
+            <div onclick="document.getElementById('file-input').click()" style="background: #ffffff; color: #333; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                <i class="fa-solid fa-file-circle-plus"></i> Add File
+            </div>
+            <div onclick="document.getElementById('folder-input').click()" style="background: #ffffff; color: #333; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+                <i class="fa-solid fa-folder-plus"></i> Add Folder
+            </div>
+        </div>
+
+        <div id="receive-input-box">
+            <div class="action-circle receive-mode" style="width: 150px; height: 150px; cursor: default;">
+                <i class="fa-solid fa-cloud-arrow-down"></i>
+                <span style="font-size: 16px;">Ready</span>
+            </div>
+            <input type="text" id="join-link-input" placeholder="Paste the Transfer Link here" style="margin-top: 20px;">
+            <button class="btn btn-success" style="display: inline-block;" onclick="joinRoomFromInput()">Connect & Receive</button>
+        </div>
+
+        <div class="link-box" id="link-box">
+            <p style="margin-bottom: 10px; font-size: 14px; color: #94a3b8;">Share this link with your client:</p>
+            <input type="text" id="share-link" readonly>
+            <div class="social-share">
+                <button class="icon-btn wa" onclick="shareWhatsApp()" title="WhatsApp"><i class="fab fa-whatsapp"></i></button>
+                <button class="icon-btn fb" onclick="shareFacebook()" title="Facebook"><i class="fab fa-facebook"></i></button>
+                <button class="icon-btn copy" onclick="copyLink()" title="Copy Link"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+
+        <div id="file-info">
+            <div style="display: flex; align-items: center;">
+                <i class="fa-solid fa-file-video" style="color: #facc15; margin-right: 10px;"></i>
+                <span id="file-name">filename.zip</span>
+            </div>
+            <span id="file-size" style="color: #94a3b8; font-size: 14px;">0 MB</span>
+        </div>
+
+        <button id="send-btn" class="btn btn-primary">Send Now</button>
+        <button id="download-btn" class="btn btn-success">Download File</button>
+
+        <div class="history-box" id="history-box">
+            <h3 style="color: #facc15; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">
+                <i class="fas fa-check-circle"></i> Download History
+            </h3>
+            <div id="history-list"></div>
+        </div>
+    </div>
+
+    <div class="mode-toggle-container" id="left-toggle-box" style="position: fixed; bottom: 30px; left: 50px; right: auto;">
+        <button id="btn-type-file" class="toggle-btn active" onclick="switchFileType('file')">File</button>
+        <button id="btn-type-folder" class="toggle-btn" onclick="switchFileType('folder')">Folder</button>
+    </div>
+
+    <div class="mode-toggle-container" id="right-toggle-box" style="position: fixed; bottom: 30px; right: 50px;">
+        <button id="btn-mode-send" class="toggle-btn active" onclick="switchMode('send')">Send</button>
+        <button id="btn-mode-receive" class="toggle-btn" onclick="switchMode('receive')">Receive</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="client.js"></script>
+    
+    <script>
+        function getLink() { return document.getElementById('share-link').value; }
+        function copyLink() {
+            const linkInput = document.getElementById('share-link');
+            linkInput.select();
+            document.execCommand('copy');
+            alert("Link copied! Share it with the receiver.");
+        }
+        function shareWhatsApp() { window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent("Download your files here: " + getLink())}`, '_blank'); }
+        function shareFacebook() { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(getLink())}`, '_blank'); }
+
+        // Naya logic: File aur Folder toggle karne ke liye
+        window.currentSelectionType = 'file'; // Default type
+        
+        function switchFileType(type) {
+            window.currentSelectionType = type;
+            
+            // Buttons ke active color ko change karna
+            document.getElementById('btn-type-file').classList.toggle('active', type === 'file');
+            document.getElementById('btn-type-folder').classList.toggle('active', type === 'folder');
+            
+            // Central Circle ke andar ka text live change karna
+            const circleText = document.querySelector('#drop-zone span');
+            if (circleText) {
+                circleText.innerText = type === 'file' ? "Select File" : "Select Folder";
+            }
+        }
+        function switchMode(mode) {
+            const sendBtn = document.getElementById('btn-mode-send');
+            const receiveBtn = document.getElementById('btn-mode-receive');
+            const dropZone = document.getElementById('drop-zone');
+            const selectionButtons = document.getElementById('selection-buttons');
+            const receiveBox = document.getElementById('receive-input-box');
+            const title = document.getElementById('status-title');
+            const desc = document.getElementById('status-desc');
+
+            const leftToggle = document.getElementById('left-toggle-box');
+            if (mode === 'send') {
+                sendBtn.classList.add('active'); receiveBtn.classList.remove('active');
+                dropZone.style.display = 'flex'; receiveBox.style.display = 'none';
+                if(leftToggle) leftToggle.style.display = 'flex'; // Send mode me left toggle dikhao
+                title.innerText = "Send Professional Files"; desc.innerText = "No size limits. Direct device-to-device transfer. Keep this tab open until client downloads.";
+                window.history.pushState('', document.title, window.location.pathname);
+            } else {
+                receiveBtn.classList.add('active'); sendBtn.classList.remove('active');
+                dropZone.style.display = 'none'; receiveBox.style.display = 'flex';
+                if(leftToggle) leftToggle.style.display = 'none'; // Receive mode me left toggle chhupao
+                title.innerText = "Receive Files"; desc.innerText = "Paste the link below to connect with the sender.";
+                if(window.location.hash) { document.getElementById('join-link-input').value = window.location.href; }
+            }
+        }
+        
+        function joinRoomFromInput() {
+            let inputVal = document.getElementById('join-link-input').value;
+            if(inputVal.includes('#')) {
+                window.location.hash = inputVal.split('#')[1];
+                location.reload();
+            } else { alert("Please paste a valid link containing '#'"); }
+        }
+
+        if(window.location.hash.length > 1) { switchMode('receive'); }
+    </script>
+
+    <section style="max-width: 1100px; margin: 60px auto 40px; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center;">
+        
+        <h2 style="color: #fff; margin-bottom: 15px; font-size: 32px; font-weight: 600;">Transfer 1000GB+ Files with Zero Limits</h2>
+        <p style="color: #94a3b8; font-size: 16px; max-width: 750px; margin: 0 auto 50px; line-height: 1.6;">
+            ProTransfer is a free, professional file-sharing platform. Send high-resolution photos, massive 4K videos, documents, or heavy RAR/ZIP archives instantly. No central cloud, just pure Hard-Disk to Hard-Disk transfer.
+        </p>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 25px; text-align: left; margin-bottom: 60px;">
+            
+            <div style="flex: 1; min-width: 260px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 30px; border-radius: 16px; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="color: #facc15; font-size: 28px; margin-bottom: 15px;"><i class="fa-solid fa-bolt"></i></div>
+                <h3 style="color: #fff; margin-bottom: 12px; font-size: 19px; font-weight: 600;">Truly Unlimited Size</h3>
+                <p style="color: #94a3b8; font-size: 14px; line-height: 1.6; margin: 0;">Forget 2GB or 250GB caps. Want to send a 1000GB folder? Go ahead! Absolutely NO data limits on your transfers.</p>
+            </div>
+            
+            <div style="flex: 1; min-width: 260px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 30px; border-radius: 16px; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="color: #3b82f6; font-size: 28px; margin-bottom: 15px;"><i class="fa-solid fa-photo-film"></i></div>
+                <h3 style="color: #fff; margin-bottom: 12px; font-size: 19px; font-weight: 600;">Any File, Any Format</h3>
+                <p style="color: #94a3b8; font-size: 14px; line-height: 1.6; margin: 0;">From RAW images to PDF documents, MP4 videos to compressed ZIP files. If it's on your device, you can transfer it instantly.</p>
+            </div>
+
+            <div style="flex: 1; min-width: 260px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 30px; border-radius: 16px; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="color: #22c55e; font-size: 28px; margin-bottom: 15px;"><i class="fa-solid fa-shield-halved"></i></div>
+                <h3 style="color: #fff; margin-bottom: 12px; font-size: 19px; font-weight: 600;">100% Secure & E2EE</h3>
+                <p style="color: #94a3b8; font-size: 14px; line-height: 1.6; margin: 0;">Your files are never saved on our servers. Direct End-to-End Encryption guarantees absolute privacy and zero data leaks.</p>
+            </div>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 40px 30px; text-align: left; max-width: 950px; margin: 0 auto;">
+            <h3 style="color: #fff; font-size: 22px; margin-bottom: 12px;"><i class="fa-solid fa-gauge-high" style="color:#facc15; margin-right:10px;"></i>How Fast is ProTransfer? (Speed Guide)</h3>
+            <p style="color: #94a3b8; font-size: 15px; margin-bottom: 25px; line-height: 1.6;">
+                Since we use direct Computer-to-Computer technology, your transfer speed depends entirely on your Internet connection. The system automatically adapts to the <b>lowest speed</b> between the Sender and the Receiver.
+            </p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                <div style="background: rgba(255,255,255,0.04); padding: 15px; border-radius: 10px;">
+                    <strong style="color: #fff; display: block; margin-bottom: 5px; font-size: 15px;">📱 4G to 4G</strong>
+                    <span style="color: #94a3b8; font-size: 13px; line-height: 1.4; display: block;">Standard Speed. Ideal for daily files. Speed varies from 2 MB/s to 5 MB/s.</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.04); padding: 15px; border-radius: 10px;">
+                    <strong style="color: #fff; display: block; margin-bottom: 5px; font-size: 15px;">📱 4G to 5G / Wi-Fi</strong>
+                    <span style="color: #94a3b8; font-size: 13px; line-height: 1.4; display: block;">Speed will be limited by the maximum upload capacity of the 4G user.</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.04); padding: 15px; border-radius: 10px; border-left: 3px solid #3b82f6;">
+                    <strong style="color: #3b82f6; display: block; margin-bottom: 5px; font-size: 15px;">🚀 5G to 5G</strong>
+                    <span style="color: #94a3b8; font-size: 13px; line-height: 1.4; display: block;">Ultra-fast! Great for video editors. Can easily handle 100GB+ files in minutes.</span>
+                </div>
+                <div style="background: rgba(255,255,255,0.04); padding: 15px; border-radius: 10px; border-left: 3px solid #22c55e;">
+                    <strong style="color: #22c55e; display: block; margin-bottom: 5px; font-size: 15px;">💻 Broadband (LAN/Wi-Fi)</strong>
+                    <span style="color: #94a3b8; font-size: 13px; line-height: 1.4; display: block;">Maximum stability & peak performance for heavy studio files without drops.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer style="text-align: center; padding: 40px 10px; margin-top: 50px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <div style="margin-bottom: 25px;">
+            <a href="/privacy-policy.html" style="color: #94a3b8; text-decoration: none; margin: 0 15px; font-size: 14px; transition: color 0.2s;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#94a3b8'">Privacy Policy</a>
+            <a href="/terms.html" style="color: #94a3b8; text-decoration: none; margin: 0 15px; font-size: 14px; transition: color 0.2s;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#94a3b8'">Terms & Conditions</a>
+            <a href="/contact.html" style="color: #94a3b8; text-decoration: none; margin: 0 15px; font-size: 14px; transition: color 0.2s;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#94a3b8'">Contact Us</a>
+        </div>
+        
+        <div style="color: #fff; font-size: 16px; margin-bottom: 12px; font-weight: 500; letter-spacing: 0.5px;">
+            Made in India with <span style="color: #ef4444; margin: 0 3px;">❤️</span> by <span style="color: #facc15; font-weight: 600;">Tathagat Communication</span>
+        </div>
+        
+        <p style="color: #64748b; font-size: 13px; margin: 0;">2026 &copy; ProTransfer &mdash; All rights reserved.</p>
+    </footer>
+</body>
+</html>
