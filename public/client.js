@@ -190,6 +190,10 @@ function setupDataChannel(channel) {
             }
             else if (data.type === 'all-complete') {
                 triggerCelebration();
+                // 👇 YAHAN STOP CODE JODEIN 👇
+        window.isTransferActive = false;
+        if(document.getElementById('transferWarning')) document.getElementById('transferWarning').style.display = 'none';
+        // 👆 ---------------------- 👆
                 if(document.getElementById('status-title')) document.getElementById('status-title').innerText = "All Files Downloaded Successfully!";
                 if(downloadBtn) downloadBtn.style.display = 'none';
                 isDownloadingMultiple = false;
@@ -352,6 +356,10 @@ if (sendBtn) {
 if (downloadBtn) {
     downloadBtn.addEventListener('click', async () => {
         isDownloadingMultiple = true;
+         // 👇 YAHAN START CODE JODEIN 👇
+        window.isTransferActive = true;
+        if(document.getElementById('transferWarning')) document.getElementById('transferWarning').style.display = 'inline-block';
+        // 👆 ---------------------- 👆
         downloadBtn.innerText = "Requesting...";
 
         try {
@@ -379,6 +387,10 @@ async function startSendingChunks() {
     if (currentFileIndex >= fileQueue.length) return;
     
     isSending = true; 
+    // 👇 YAHAN START CODE JODEIN 👇
+    window.isTransferActive = true;
+    if(document.getElementById('transferWarning')) document.getElementById('transferWarning').style.display = 'inline-block';
+    // 👆 ----------------------
     const file = fileQueue[currentFileIndex];
     const dc = dataChannel;
 
@@ -464,6 +476,10 @@ function moveToNextFile() {
         if (dataChannel && dataChannel.readyState === 'open') {
             dataChannel.send(JSON.stringify({ type: 'all-complete' }));
         }
+        // 👇 YAHAN STOP CODE JODEIN 👇
+        window.isTransferActive = false;
+        if(document.getElementById('transferWarning')) document.getElementById('transferWarning').style.display = 'none';
+        // 👆 ---------------------- 👆
         if (sendBtn) {
             sendBtn.innerHTML = "<i class='fas fa-check'></i> All Sent Successfully!";
             sendBtn.style.background = "#22c55e";

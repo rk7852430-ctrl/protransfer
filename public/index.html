@@ -62,16 +62,142 @@
         .btn-success:hover { background: #16a34a; transform: translateY(-2px); }
         
         .history-box { margin-top: 30px; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 20px; width: 100%; text-align: left; display: none; }
+
+        /* Toggle Button Design (Mobile & PC Auto Adjust) */
+.theme-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+/* Mobile screen ke liye button ko thoda chhota karna */
+@media (max-width: 600px) {
+  .theme-btn {
+    padding: 6px 14px;
+    font-size: 12px;
+  }
+}
+
+/* -------------------------------------- */
+/* VIBRANT GLASSMORPHISM STYLE (PREMIUM)  */
+/* -------------------------------------- */
+
+/* 1. Main Background - Cyan to Pink Vibrant Gradient */
+body.light-mode {
+  background: linear-gradient(135deg, #00c6ff 0%, #bd00ff 50%, #ff007f 100%) !important;
+  color: #ffffff !important;
+}
+
+/* 2. Ultra Premium Glass Cards (Main Box + Ad Boxes Sab Sheeshe jaisa) */
+body.light-mode section > div,
+body.light-mode .glass-card,
+body.light-mode .history-box,
+body.light-mode footer,
+body.light-mode .link-box,
+body.light-mode .side-ad-box,    /* Laptop Ad Box */
+body.light-mode .mobile-ad-box {  /* Mobile Ad Box */
+  background: rgba(255, 255, 255, 0.1) !important; /* 100% Transparent Glass */
+  backdrop-filter: blur(25px) !important;
+  -webkit-backdrop-filter: blur(25px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.6) !important; /* Premium 3D edge sheen */
+  border-left: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* 3. TEXT VISIBILITY FIX - Pure White with Soft Shadow for Depth */
+body.light-mode h1, 
+body.light-mode h2, 
+body.light-mode h3, 
+body.light-mode span,
+body.light-mode p,
+body.light-mode label,
+body.light-mode a,
+body.light-mode i {
+  color: #ffffff !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4) !important; /* Text chamak ke bahar aayega */
+}
+
+/* Chhote text ko soft glass white rang dena */
+body.light-mode p[style*="color: #94a3b8"], 
+body.light-mode .small-text {
+  color: rgba(255, 255, 255, 0.9) !important; 
+}
+
+/* 4. BOTTOM BUTTONS CONTAINER (File/Folder & Send/Receive) */
+body.light-mode .mode-toggle-container {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
+  backdrop-filter: blur(15px) !important;
+}
+
+/* Inactive Buttons text visibility */
+body.light-mode .toggle-btn {
+  color: #ffffff !important; 
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4) !important;
+}
+
+/* Active Buttons (Yellow pill style with deep black text) */
+body.light-mode .toggle-btn.active {
+  background: #facc15 !important;
+  color: #000000 !important;
+  text-shadow: none !important;
+}
+
+/* 5. Top Theme Toggle Button Style in Light Mode */
+body.light-mode .theme-btn {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(10px) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Warning Text Design */
+.transfer-warning {
+  color: #ef4444 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  margin-top: 15px !important;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 8px 15px;
+  border-radius: 8px;
+  animation: blinkGlow 2s infinite ease-in-out;
+}
+body.light-mode .transfer-warning {
+  color: #ffffff !important;
+  background: rgba(239, 68, 68, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+@keyframes blinkGlow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
     </style>
 </head>
 <body>
     <nav>
         <div class="logo"><i class="fa-solid fa-bolt"></i>ProTransfer</div>
+        <button id="themeToggle" class="theme-btn">
+  ☀️ Light
+</button>
     </nav>
     <div class="glass-card-wrapper">
     <div class="glass-card" style="max-width: 660px; margin-top: 10px;">
         <h1 id="status-title">Send Professional Files</h1>
         <p id="status-desc" style="color: #94a3b8; margin-bottom: 30px;">No size limits. Direct device-to-device transfer.</p>
+        <p id="transferWarning" class="transfer-warning" style="display: none;">
+  ⚠️ Transfer in Progress: Do not close, refresh, or lock your screen!
+</p>
         
         <input type="file" id="file-input" multiple style="display: none;">
         <input type="file" id="folder-input" webkitdirectory directory multiple style="display: none;">
@@ -407,6 +533,37 @@
     if (document.visibilityState === 'visible') {
       console.log('User is back, resuming Wake Lock...');
       requestWakeLock();
+    }
+  });
+  const themeToggle = document.getElementById('themeToggle');
+  
+  // App hamesha By-Default DARK khulega. 
+  // Bas check kar rahe hain ki kya user ne pichli baar light mode choda tha:
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light-mode');
+    themeToggle.innerHTML = '🌙 Dark';
+  }
+
+  // Button dabane par White Glass effect on/off karna
+  themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
+    
+    if (document.body.classList.contains('light-mode')) {
+      themeToggle.innerHTML = '🌙 Dark';
+      localStorage.setItem('theme', 'light');
+    } else {
+      themeToggle.innerHTML = '☀️ Light';
+      localStorage.setItem('theme', 'dark'); // Wapas Default dark mode
+    }
+  });
+  // Yeh track karega ki file ja rahi hai ya nahi
+  window.isTransferActive = false; 
+
+  // Tab band hone se rokne wala popup
+  window.addEventListener('beforeunload', function (e) {
+    if (window.isTransferActive === true) {
+      e.preventDefault();
+      e.returnValue = ''; 
     }
   });
 </script>
