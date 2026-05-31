@@ -383,5 +383,32 @@
     });
   }
 </script>
+<script>
+  let wakeLock = null;
+
+  // Screen Light ON karne ka function
+  async function requestWakeLock() {
+    try {
+      if ('wakeLock' in navigator) {
+        wakeLock = await navigator.wakeLock.request('screen');
+        console.log('✅ Screen Light is ON!');
+      }
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
+  }
+
+  // 1. User ke touch karte hi light ON kar do
+  document.addEventListener('click', requestWakeLock);
+  document.addEventListener('touchstart', requestWakeLock);
+
+  // 2. Jaise hi user kisi dusre app se WAPAS aaye, light wapas ON kar do
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      console.log('User is back, resuming Wake Lock...');
+      requestWakeLock();
+    }
+  });
+</script>
 </body>
 </html>
