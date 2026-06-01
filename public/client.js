@@ -488,3 +488,17 @@ function moveToNextFile() {
         triggerCelebration();
     }
 }
+// 🔥 APPLE STYLE SUBTLE HAPTIC FEEDBACK
+function triggerPremiumHaptic() {
+    if (navigator.vibrate) {
+        // 12ms ka ultra-short vibration jo liquid pop jaisa feel deta hai
+        navigator.vibrate(12); 
+    }
+}
+
+// App ke sabhi clickable buttons aur zones par automatic haptic lagaao
+document.addEventListener('click', (e) => {
+    if (e.target.closest('button') || e.target.closest('.theme-btn') || e.target.closest('#drop-zone') || e.target.closest('.action-circle')) {
+        triggerPremiumHaptic();
+    }
+});
