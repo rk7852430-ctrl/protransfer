@@ -198,6 +198,10 @@ function setupDataChannel(channel) {
                 if(downloadBtn) downloadBtn.style.display = 'none';
                 isDownloadingMultiple = false;
                 directoryHandle = null;
+            setTimeout(() => {
+            if (typeof triggerPremiumHaptic === 'function') triggerPremiumHaptic();
+            showPremiumAlert(); // 👈 Purane alert ki jagah bas yeh naam aayega
+        }, 3500);
             }
         } else if (e.data instanceof ArrayBuffer) {
             if (fileWritableStream) {
@@ -502,3 +506,81 @@ document.addEventListener('click', (e) => {
         triggerPremiumHaptic();
     }
 });
+
+
+// 🔥 CUSTOM PREMIUM GLASS POPUP (Auto Dark/Light Theme Aware)
+function showPremiumAlert() {
+    
+    // 🧠 Smart Theme Detector
+    const isLightMode = document.body.classList.contains('light-mode') || 
+                        document.body.classList.contains('light') || 
+                        window.getComputedStyle(document.body).color === 'rgb(0, 0, 0)' ||
+                        (document.getElementById('theme-toggle') && document.getElementById('theme-toggle').innerText.includes('Dark'));
+
+    // 🎨 Glassmorphism Colors set karna
+    // Light mode mein background transparency 0.45 se badhakar 0.75 kar di hai taaki text ubhar kar aaye
+    const glassBg = isLightMode ? "rgba(255, 255, 255, 0.75)" : "rgba(30, 41, 59, 0.55)";
+    const glassBorder = isLightMode ? "rgba(255, 255, 255, 0.8)" : "rgba(255, 255, 255, 0.1)";
+    
+    // Text ko ekdum dark kar diya hai padhne mein aasan karne ke liye
+    const textColor = isLightMode ? "#000000" : "#ffffff"; 
+    const subTextColor = isLightMode ? "#333333" : "#94a3b8"; 
+    
+    const innerBoxBg = isLightMode ? "rgba(0, 0, 0, 0.06)" : "rgba(0, 0, 0, 0.2)";
+    const overlayBg = isLightMode ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.6)";
+
+    // 1. Pichhe ka Overlay 
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: ${overlayBg}; z-index: 99999; display: flex; justify-content: center; align-items: center; backdrop-filter: blur(6px); transition: opacity 0.3s ease;`;
+
+    // 2. Main Glass Popup Box
+    const popup = document.createElement('div');
+    popup.style.cssText = `
+        background: ${glassBg};
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid ${glassBorder};
+        padding: 30px 25px;
+        border-radius: 20px;
+        width: 85%;
+        max-width: 380px;
+        text-align: center;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        transform: scale(0.8);
+        animation: glassPopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    `;
+
+    // 3. Popup ke andar ka Content
+    popup.innerHTML = `
+        <style>
+            @keyframes glassPopIn { to { transform: scale(1); } }
+        </style>
+        <div style="font-size: 55px; color: #22c55e; margin-bottom: 15px; filter: drop-shadow(0 4px 10px rgba(34,197,94,0.4));">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h2 style="margin: 0 0 10px; color: ${textColor}; font-size: 24px; font-weight: 800; font-family: sans-serif; letter-spacing: -0.5px;">Transfer Complete</h2>
+        <p style="margin: 0 0 25px; color: ${subTextColor}; font-size: 14px; line-height: 1.6; font-family: sans-serif;">
+            Your files are safely stored on your device.<br><br>
+            <span style="background: ${innerBoxBg}; padding: 8px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; color: ${textColor}; border: 1px solid ${glassBorder}; display: inline-block; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);">
+                📁 Location: Your Selected Folder
+            </span>
+        </p>
+        <button id="premium-btn" style="background: #facc15; color: #000000; border: none; padding: 15px 24px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 8px 20px rgba(250, 204, 21, 0.3); transition: transform 0.1s ease;">
+            Got it
+        </button>
+    `;
+
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
+
+    // 4. Button Par Click Effect
+    const btn = document.getElementById('premium-btn');
+    btn.addEventListener('mousedown', () => btn.style.transform = 'scale(0.95)');
+    btn.addEventListener('mouseup', () => btn.style.transform = 'scale(1)');
+    
+    btn.addEventListener('click', () => {
+        if (typeof triggerPremiumHaptic === 'function') triggerPremiumHaptic();
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.remove(), 300);
+    });
+}
