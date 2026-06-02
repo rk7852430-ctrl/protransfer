@@ -175,8 +175,8 @@ function setupDataChannel(channel) {
                     historyBox.style.display = 'block';
                     const sizeMB = (incomingFileInfo.size / 1048576).toFixed(2);
                     const newItem = document.createElement('div');
-                    newItem.style.cssText = "display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.05); margin-bottom: 5px; border-radius: 5px; border-left: 4px solid #22c55e;";
-                    newItem.innerHTML = `<div><i class="fas fa-file-download" style="color:#22c55e; margin-right: 10px;"></i> <span style="color:#fff;">${incomingFileInfo.name}</span></div><div style="color: #94a3b8;">${sizeMB} MB</div>`;
+                    newItem.style.cssText = "display: flex; justify-content: space-between; padding: 10px; word-break: break-all; word-wrap: break-word; background: rgba(255,255,255,0.05); margin-bottom: 5px; border-radius: 5px; border-left: 4px solid #22c55e;";
+                    newItem.innerHTML = `<div><i class="fas fa-file-download" style="color:#22c55e; margin-right: 10px;"></i> <span style="color:#fff; word-break: break-all; word-wrap: break-word; ">${incomingFileInfo.name}</span></div><div style="color: #94a3b8;">${sizeMB} MB</div>`;
                     historyList.appendChild(newItem);
                 }
                 receivedSize = 0;
