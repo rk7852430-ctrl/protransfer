@@ -435,6 +435,30 @@ body.light-mode #chat-input { background: rgba(0,0,0,0.05); color: #000; }
     display: flex; align-items: center; justify-content: center;
     border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
+/* --- MOBILE VIEW RESPONSIVE FIX (FULL SCREEN CHAT) --- */
+@media (max-width: 600px) {
+    #chat-widget {
+        bottom: 115px; 
+        right: 15px; 
+    }
+    
+    /* Mobile par Chat Popup ko Full Screen banaya */
+    .chat-popup-glass {
+        width: 100vw !important; 
+        height: 100vh !important; 
+        position: fixed !important; 
+        bottom: 0 !important; 
+        right: 0 !important;
+        border-radius: 0 !important; 
+        z-index: 9999 !important; 
+    }
+    
+    /* Jab chat band ho, tab wo chhupa rahe */
+    .chat-popup-glass.hidden {
+        transform: translateY(100%); 
+        opacity: 0;
+    }
+}
 .chat-badge.hidden { display: none; }
 
 /* Ticks CSS */
