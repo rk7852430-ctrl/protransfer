@@ -1,3 +1,8 @@
+// Ask for Notification Permission on load
+if ("Notification" in window && Notification.permission !== "granted" && Notification.permission !== "denied") {
+    Notification.requestPermission();
+}
+
 const socket = io();
 const fileInput = document.getElementById('file-input');
 const folderInput = document.getElementById('folder-input');
@@ -106,6 +111,8 @@ function setupDataChannel(channel) {
     channel.binaryType = 'arraybuffer';
 
     channel.onopen = () => {
+        document.getElementById('chat-status').innerHTML = "🟢 Online";
+        document.getElementById('chat-status').className = "status-online";
         console.log('✅ Data Channel Connected!');
         if (!isReceiver) {
             if(isWaitingToSend) sendMetadata();
@@ -122,6 +129,29 @@ function setupDataChannel(channel) {
     channel.onmessage = async (e) => {
         if (typeof e.data === 'string') {
             const data = JSON.parse(e.data);
+           // Chat receive karne ka logic (With Sound & Notification)
+if (data.type === 'chat-message') {
+    appendMessage(data.content, 'received');
+    
+    // 1. Phone Vibration (Agar mobile hai)
+    if (navigator.vibrate) navigator.vibrate([20, 50, 20]); 
+
+    // 2. Premium Message Sound (Ting 🔔)
+    try {
+        let msgSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
+        msgSound.play();
+    } catch(e) { console.log("Sound play error", e); }
+
+    // 3. Desktop/Mobile Push Notification (Sirf tab dikhega jab user kisi doosre tab/app mein hoga)
+    if (document.hidden && "Notification" in window && Notification.permission === "granted") {
+        new Notification("New Message - ProTransfer", {
+            body: data.content,
+            icon: "favicon.png" // Aapka apna logo
+        });
+    }
+    
+    return; // Aage ka file transfer code run hone se roko
+}
 
             if (data.type === 'request-metadata') {
                 if (!isReceiver && selectedFile) {
@@ -583,4 +613,60 @@ function showPremiumAlert() {
         overlay.style.opacity = '0';
         setTimeout(() => overlay.remove(), 300);
     });
+}
+
+// --- CHAT SYSTEM LOGIC ---
+
+// 1. Chat Open/Close
+function toggleChat() {
+    const popup = document.getElementById('chat-popup');
+    popup.classList.toggle('hidden');
+    if(!popup.classList.contains('hidden')) {
+        document.getElementById('chat-input').focus();
+    }
+}
+
+// 2 & 3. Haptic Vibration & Enter Key (Safe Load)
+window.addEventListener('load', () => {
+    const chatInput = document.getElementById('chat-input');
+    if (chatInput) {
+        chatInput.addEventListener('input', () => {
+            if (navigator.vibrate) navigator.vibrate(5);
+        });
+        
+        chatInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') sendChatMessage();
+        });
+    }
+});
+
+// 4. Message Bhejna
+function sendChatMessage() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (text === '') return;
+    
+    if (!dataChannel || dataChannel.readyState !== 'open') {
+        alert("Wait for the other user to connect first!");
+        return;
+    }
+
+    dataChannel.send(JSON.stringify({ type: 'chat-message', content: text }));
+    appendMessage(text, 'sent');
+    
+    input.value = '';
+    if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
+}
+
+// 5. Message Screen Par Dikhana
+function appendMessage(text, type) {
+    const chatBody = document.getElementById('chat-messages');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `msg-bubble ${type === 'sent' ? 'msg-sent' : 'msg-received'}`;
+    
+    const ticks = type === 'sent' ? `<span class="msg-ticks ticks-read">✓✓</span>` : '';
+    
+    msgDiv.innerHTML = `${text} ${ticks}`;
+    chatBody.appendChild(msgDiv);
+    chatBody.scrollTop = chatBody.scrollHeight;
 }

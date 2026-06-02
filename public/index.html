@@ -190,6 +190,72 @@ body.light-mode .transfer-warning {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.7; }
 }
+
+/* --- CHAT SYSTEM CSS --- */
+#chat-widget { position: fixed; bottom: 100px; right: 25px; z-index: 9999; font-family: sans-serif; }
+
+/* Floating Chat Button */
+.chat-fab-btn {
+    width: 60px; height: 60px; border-radius: 50%; background: #facc15; border: none;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-size: 26px; color: #000; cursor: pointer;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.chat-fab-btn:hover { transform: scale(1.1); }
+
+/* Chat Popup (Glassmorphism Dark Default) */
+.chat-popup-glass {
+    position: absolute; bottom: 75px; right: 0; width: 300px; height: 360px;
+    background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 20px;
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5); transform-origin: bottom right;
+    transition: all 0.3s ease;
+}
+.chat-popup-glass.hidden { transform: scale(0); opacity: 0; pointer-events: none; }
+
+/* Light Theme Adjustments (Agar body par 'light-mode' class hai) */
+body.light-mode .chat-popup-glass {
+    background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+}
+body.light-mode .chat-header { color: #000; border-bottom: 1px solid rgba(0,0,0,0.1); }
+body.light-mode .chat-input { color: #000; }
+
+/* Header, Body, Footer Elements */
+.chat-header { padding: 15px; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
+.status-online { color: #22c55e; font-size: 12px; font-weight: bold; }
+.status-offline { color: #ef4444; font-size: 12px; }
+.close-chat { background: none; border: none; color: inherit; font-size: 18px; cursor: pointer; }
+
+.chat-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.system-msg { text-align: center; font-size: 12px; color: #888; margin-bottom: 10px; }
+
+/* Message Bubbles */
+.msg-bubble { max-width: 80%; padding: 10px 14px; border-radius: 15px; font-size: 14px; line-height: 1.4; word-wrap: break-word;}
+.msg-sent { background: #facc15; color: #000; align-self: flex-end; border-bottom-right-radius: 2px; }
+.msg-received { background: rgba(255,255,255,0.1); color: #fff; align-self: flex-start; border-bottom-left-radius: 2px; }
+body.light-mode .msg-received { background: rgba(0,0,0,0.05); color: #000; }
+
+/* Ticks */
+.msg-ticks { font-size: 11px; margin-left: 6px; color: #555; }
+.ticks-read { color: #000; } /* Blue/Dark tick for sent messages */
+
+.chat-footer { padding: 10px; display: flex; gap: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
+body.light-mode .chat-footer { border-top: 1px solid rgba(0,0,0,0.1); }
+#chat-input { flex: 1; padding: 10px 15px; border-radius: 20px; border: none; background: rgba(255,255,255,0.1); color: #fff; outline: none; }
+body.light-mode #chat-input { background: rgba(0,0,0,0.05); color: #000; }
+#chat-send-btn { background: #facc15; color: #000; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
+/* --- MOBILE VIEW RESPONSIVE FIX --- */
+@media (max-width: 600px) {
+    #chat-widget {
+        bottom: 80px; /* Mobile par chat button ko thoda niche kiya */
+        right: 15px; /* Side se thoda pass kiya */
+    }
+    .chat-popup-glass {
+        width: 270px; /* Mobile par popup ki chaudai aur kam */
+        height: 320px; /* Mobile par popup ki height kam */
+    }
+}
     </style>
 </head>
 <body>
@@ -575,5 +641,35 @@ body.light-mode .transfer-warning {
     }
   });
 </script>
+
+<!-- PREMIUM CHAT SYSTEM -->
+<div id="chat-widget">
+    <!-- Chat Button -->
+    <button id="chat-fab" class="chat-fab-btn" onclick="toggleChat()">
+        <i class="fas fa-comment-dots"></i>
+    </button>
+
+    <!-- Chat Box (Popup) -->
+    <div id="chat-popup" class="chat-popup-glass hidden">
+        <div class="chat-header">
+            <div>
+                <h4 style="margin:0; font-size: 16px;">Pro Transfer Chat</h4>
+                <span id="chat-status" class="status-offline">🔴 Waiting for user...</span>
+            </div>
+            <button onclick="toggleChat()" class="close-chat"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div id="chat-messages" class="chat-body">
+            <!-- Messages yahan aayenge -->
+            <div class="system-msg">Chat is end-to-end encrypted.</div>
+        </div>
+
+        <div class="chat-footer">
+            <input type="text" id="chat-input" placeholder="Type a message..." autocomplete="off">
+            <button id="chat-send-btn" onclick="sendChatMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
