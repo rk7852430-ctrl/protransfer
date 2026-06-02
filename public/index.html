@@ -443,14 +443,16 @@ body.light-mode #chat-input { background: rgba(0,0,0,0.05); color: #000; }
     }
     
     /* Mobile par Chat Popup ko Full Screen banaya */
+    /* Mobile par Chat Popup ko Full Screen banaya */
     .chat-popup-glass {
-        width: 100vw !important; 
-        height: 100vh !important; 
-        position: fixed !important; 
-        bottom: 0 !important; 
+        width: 100vw !important;
+        height: 100dvh !important; /* Yahan 100vh ki jagah 100% kar diya */
+        position: fixed !important;
+        top: 0 !important; /* NAYI LINE: Chat box ko upar se lock kar diya */
+        bottom: 0 !important;
         right: 0 !important;
-        border-radius: 0 !important; 
-        z-index: 9999 !important; 
+        border-radius: 0 !important;
+        z-index: 9999 !important;
     }
     
     /* Jab chat band ho, tab wo chhupa rahe */

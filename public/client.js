@@ -654,16 +654,28 @@ function toggleChat() {
     }
 }
 
-// 2 & 3. Haptic Vibration & Enter Key (Safe Load)
+// 2 & 3. Haptic Vibration, Enter Key & Keyboard Auto-Scroll Fix
 window.addEventListener('load', () => {
     const chatInput = document.getElementById('chat-input');
     if (chatInput) {
+        // Typing par haptic vibration
         chatInput.addEventListener('input', () => {
             if (navigator.vibrate) navigator.vibrate(5);
         });
         
+        // Enter dabane par message send
         chatInput.addEventListener('keypress', function (e) {
             if (e.key === 'Enter') sendChatMessage();
+        });
+
+        // NAYA CODE: Keyboard khulte hi chat ko automatically niche dhakelna
+        chatInput.addEventListener('focus', () => {
+            setTimeout(() => {
+                const chatBody = document.getElementById('chat-messages');
+                if (chatBody) {
+                    chatBody.scrollTop = chatBody.scrollHeight;
+                }
+            }, 300); // 300ms ka wait taaki keyboard poora khul jaye
         });
     }
 });
