@@ -424,6 +424,22 @@ body.light-mode #chat-input { background: rgba(0,0,0,0.05); color: #000; }
            display: none; 
         }
       }
+
+      /* --- CHAT BADGE & WHATSAPP TICKS CSS --- */
+.chat-fab-btn { position: relative; } /* Button ko relative kiya taaki badge uspe set ho */
+.chat-badge {
+    position: absolute; top: -5px; right: -2px;
+    background: #ef4444; color: white;
+    font-size: 12px; font-weight: bold;
+    width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+}
+.chat-badge.hidden { display: none; }
+
+/* Ticks CSS */
+.unread-tick { color: #6b7280 !important; font-size: 11px; margin-left: 5px; } /* Thoda Dark Grey */
+.read-tick { color: #0056b3 !important; font-size: 11px; margin-left: 5px; font-weight: 900; } /* Ekdum Mast Strong VIP Blue */
     </style>
 
 <div class="side-ad-box">
@@ -645,9 +661,10 @@ body.light-mode #chat-input { background: rgba(0,0,0,0.05); color: #000; }
 <!-- PREMIUM CHAT SYSTEM -->
 <div id="chat-widget">
     <!-- Chat Button -->
-    <button id="chat-fab" class="chat-fab-btn" onclick="toggleChat()">
-        <i class="fas fa-comment-dots"></i>
-    </button>
+   <button id="chat-fab" class="chat-fab-btn" onclick="toggleChat()">
+    <i class="fas fa-comment-dots"></i>
+    <span id="chat-badge" class="chat-badge hidden">0</span>
+   </button>
 
     <!-- Chat Box (Popup) -->
     <div id="chat-popup" class="chat-popup-glass hidden">

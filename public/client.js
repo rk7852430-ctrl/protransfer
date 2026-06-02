@@ -129,28 +129,45 @@ function setupDataChannel(channel) {
     channel.onmessage = async (e) => {
         if (typeof e.data === 'string') {
             const data = JSON.parse(e.data);
-           // Chat receive karne ka logic (With Sound & Notification)
+           // Chat receive karne ka logic (With Badge & Read Receipts)
 if (data.type === 'chat-message') {
     appendMessage(data.content, 'received');
     
-    // 1. Phone Vibration (Agar mobile hai)
-    if (navigator.vibrate) navigator.vibrate([20, 50, 20]); 
+    // Check karo kya chat dabba band hai?
+    const popup = document.getElementById('chat-popup');
+    if (popup.classList.contains('hidden')) {
+        unreadCount++; // Number badao
+        const badge = document.getElementById('chat-badge');
+        badge.innerText = unreadCount;
+        badge.classList.remove('hidden'); // Red badge dikhao
+    } else {
+        // Agar dabba khula hai toh turant Read Receipt bhej do
+        if (dataChannel && dataChannel.readyState === 'open') {
+            dataChannel.send(JSON.stringify({ type: 'chat-read' }));
+        }
+    }
 
-    // 2. Premium Message Sound (Ting 🔔)
+    if (navigator.vibrate) navigator.vibrate([20, 50, 20]); 
     try {
         let msgSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3');
         msgSound.play();
-    } catch(e) { console.log("Sound play error", e); }
-
-    // 3. Desktop/Mobile Push Notification (Sirf tab dikhega jab user kisi doosre tab/app mein hoga)
-    if (document.hidden && "Notification" in window && Notification.permission === "granted") {
-        new Notification("New Message - ProTransfer", {
-            body: data.content,
-            icon: "favicon.png" // Aapka apna logo
-        });
-    }
+    } catch(e) {}
     
-    return; // Aage ka file transfer code run hone se roko
+    if (document.hidden && "Notification" in window && Notification.permission === "granted") {
+        new Notification("New Message - ProTransfer", { body: data.content, icon: "favicon.png" });
+    }
+    return;
+}
+
+// Agar doosre user ne chat dabba khol liya (Double Tick Logic)
+if (data.type === 'chat-read') {
+    const unreadTicks = document.querySelectorAll('.unread-tick');
+    unreadTicks.forEach(tick => {
+        // Ekdum chamakta hua Bright Blue (#007bff) aur bada size!
+        tick.innerHTML = '<span style="color: #007bff !important; font-size: 14px; font-weight: 900;">✓✓</span>'; 
+        tick.classList.replace('unread-tick', 'read-tick');
+    });
+    return;
 }
 
             if (data.type === 'request-metadata') {
@@ -616,13 +633,24 @@ function showPremiumAlert() {
 }
 
 // --- CHAT SYSTEM LOGIC ---
+let unreadCount = 0; // Unread message ginne ke liye
 
-// 1. Chat Open/Close
+// 1. Chat Open/Close (Tick update logic)
 function toggleChat() {
     const popup = document.getElementById('chat-popup');
     popup.classList.toggle('hidden');
+    
     if(!popup.classList.contains('hidden')) {
         document.getElementById('chat-input').focus();
+        
+        // Badge ko 0 karo aur chupao
+        unreadCount = 0;
+        document.getElementById('chat-badge').classList.add('hidden');
+
+        // Samne wale ko batao ki maine chat padh li hai
+        if (dataChannel && dataChannel.readyState === 'open') {
+            dataChannel.send(JSON.stringify({ type: 'chat-read' }));
+        }
     }
 }
 
@@ -640,7 +668,7 @@ window.addEventListener('load', () => {
     }
 });
 
-// 4. Message Bhejna
+// 4. Message Bhejna (Single Tick)
 function sendChatMessage() {
     const input = document.getElementById('chat-input');
     const text = input.value.trim();
@@ -652,19 +680,20 @@ function sendChatMessage() {
     }
 
     dataChannel.send(JSON.stringify({ type: 'chat-message', content: text }));
-    appendMessage(text, 'sent');
+    appendMessage(text, 'sent'); 
     
     input.value = '';
     if (navigator.vibrate) navigator.vibrate([10, 30, 10]);
 }
 
-// 5. Message Screen Par Dikhana
+// 5. Message Screen Par Dikhana (Ticks Logic)
 function appendMessage(text, type) {
     const chatBody = document.getElementById('chat-messages');
     const msgDiv = document.createElement('div');
     msgDiv.className = `msg-bubble ${type === 'sent' ? 'msg-sent' : 'msg-received'}`;
     
-    const ticks = type === 'sent' ? `<span class="msg-ticks ticks-read">✓✓</span>` : '';
+    // Single tick: Ekdum perfect WhatsApp jaisa Soft Grey (#888888)
+    const ticks = type === 'sent' ? `<span class="msg-ticks unread-tick" style="color: #888888 !important; font-size: 14px; margin-left: 5px; font-weight: bold;">✓</span>` : '';
     
     msgDiv.innerHTML = `${text} ${ticks}`;
     chatBody.appendChild(msgDiv);
