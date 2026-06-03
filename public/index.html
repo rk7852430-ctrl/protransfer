@@ -91,6 +91,13 @@
     font-size: 11.5px !important;  /* Text ekdum clean aur readable dikhega */
     border-radius: 30px !important;/* Perfect smooth pill-shape capsular design */
   }
+  /* Mobile View - Long File Name Fix */
+        #file-info, #file-info * {
+            word-break: break-all !important;
+            overflow-wrap: break-word !important;
+            white-space: normal !important;
+            min-width: 0 !important; /* Flexbox को बाहर भागने से रोकेगा */
+        }
 }
 
 /* -------------------------------------- */
