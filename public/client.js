@@ -276,7 +276,9 @@ if (data.type === 'chat-read') {
             if (downloadBtn) downloadBtn.innerText = `Downloading... ${percentage}% [${timeText}]`;
 
             if (!fileWritableStream && receivedSize === incomingFileInfo.size) {
-                const blob = new Blob(receiveBuffer);
+                // पुराना कोड: const blob = new Blob(receiveBuffer);
+        // नया फिक्स कोड (फाइल टाइप के साथ):
+                const blob = new Blob(receiveBuffer, { type: incomingFileInfo.type || 'application/octet-stream' });
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(blob);
                 a.download = incomingFileInfo.name;
