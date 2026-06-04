@@ -264,6 +264,71 @@ body.light-mode #chat-input { background: rgba(0,0,0,0.05); color: #000; }
         height: 320px; /* Mobile par popup ki height kam */
     }
 }
+/* --- SEO SECTION CSS --- */
+.seo-section {
+    margin: 40px auto;
+    width: 90%;
+    max-width: 1200px;
+    padding: 30px;
+    text-align: left;
+}
+
+.seo-container {
+    display: flex;
+    gap: 40px;
+    justify-content: space-between;
+}
+
+.seo-box {
+    flex: 1;
+}
+
+.seo-box h3 {
+    margin-bottom: 20px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.seo-box ol {
+    padding-left: 20px;
+    line-height: 1.8;
+    font-size: 15px;
+}
+
+.seo-box ol li {
+    margin-bottom: 12px;
+}
+
+.faq-item {
+    margin-bottom: 15px;
+}
+
+.faq-item strong {
+    font-size: 15px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.faq-item p {
+    font-size: 14px;
+    margin: 0;
+    opacity: 0.9;
+    line-height: 1.5;
+}
+
+/* --- MOBILE RESPONSIVE DESIGN --- */
+@media (max-width: 768px) {
+    .seo-container {
+        flex-direction: column; /* मोबाइल में यह दोनों बॉक्स को ऊपर-नीचे कर देगा */
+        gap: 30px;
+    }
+    .seo-section {
+        padding: 20px;
+        margin: 20px auto;
+    }
+}
     </style>
 </head>
 <body>
@@ -613,7 +678,38 @@ body.light-mode #chat-input { background: rgba(0,0,0,0.05); color: #000; }
             </div>
         </div>
     </section>
+<!-- SEO CONTENT SECTION (How to Share & FAQ) -->
+<div class="glass-card seo-section">
+    <div class="seo-container">
+        <!-- Left Side: How it Works -->
+        <div class="seo-box">
+            <h3><i class="fas fa-share-nodes"></i> How to Share Large Files</h3>
+            <ol>
+                <li><strong>Select Your Files:</strong> Click the 'File' or 'Folder' button to select massive 4K videos, photos, or documents.</li>
+                <li><strong>Share the Secure Link:</strong> Copy the generated link or share it directly via WhatsApp with the receiver.</li>
+                <li><strong>Keep Tab Open:</strong> Since this is a direct Peer-to-Peer transfer, keep the tab open until the download is complete.</li>
+            </ol>
+        </div>
 
+        <!-- Right Side: FAQ -->
+        <div class="seo-box">
+            <h3><i class="fas fa-circle-question"></i> Frequently Asked Questions</h3>
+            <div class="faq-item">
+                <strong>Is ProTransfer completely free?</strong>
+                <p>Yes, our high-speed file sharing platform is 100% free with absolutely no hidden charges.</p>
+            </div>
+            <div class="faq-item">
+                <strong>Are my files safe and secure?</strong>
+                <p>Absolutely. We use End-to-End Encryption (E2EE). Files go directly from your device to the receiver and are never stored on any cloud servers.</p>
+            </div>
+            <div class="faq-item">
+                <strong>What is the maximum file size limit?</strong>
+                <p>There is zero limit! You can transfer 100GB+ files seamlessly without any restrictions.</p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- SEO CONTENT SECTION END -->
     <footer style="text-align: center; padding: 40px 10px; margin-top: 50px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.05); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
         <div style="margin-bottom: 25px;">
             <a href="/privacy-policy.html" style="color: #94a3b8; text-decoration: none; margin: 0 15px; font-size: 14px; transition: color 0.2s;" onmouseover="this.style.color='#facc15'" onmouseout="this.style.color='#94a3b8'">Privacy Policy</a>
